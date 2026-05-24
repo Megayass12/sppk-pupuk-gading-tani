@@ -11,8 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('penilaians', function (Blueprint $table) {
+        Schema::create('penilaian_suppliers', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('supplier_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->foreignId('kriteria_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->decimal('nilai', 8, 4);
+
             $table->timestamps();
         });
     }
@@ -22,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('penilaians');
+        Schema::dropIfExists('penilaian_suppliers');
     }
 };

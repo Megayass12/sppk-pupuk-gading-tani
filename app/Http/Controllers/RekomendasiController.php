@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
-use App\Models\Bobot;
+use App\Models\Kriteria;
 
 class RekomendasiController extends Controller
 {
@@ -19,22 +19,22 @@ class RekomendasiController extends Controller
     public function index()
     {
         $suppliers = Supplier::all();
-        $bobots    = Bobot::all();
-        $totalBobot = $bobots->sum('bobot');
+        $kriteria    = Kriteria::all();
+        $totalBobot = $kriteria->sum('bobot');
 
-        if ($suppliers->isEmpty() || $bobots->isEmpty() || abs($totalBobot - 1.0) > 0.0001) {
-            $error = 'Data supplier atau bobot tidak lengkap. Pastikan ada supplier dan total bobot harus = 1.';
-            if ($suppliers->isEmpty() || $bobots->isEmpty()) {
-                $error = 'Data supplier atau bobot masih kosong.';
+        if ($suppliers->isEmpty() || $kriteria->isEmpty() || abs($totalBobot - 1.0) > 0.0001) {
+            $error = 'Data supplier atau kriteria tidak lengkap. Pastikan ada supplier dan total kriteria harus = 1.';
+            if ($suppliers->isEmpty() || $kriteria->isEmpty()) {
+                $error = 'Data supplier atau kriteria masih kosong.';
             } elseif (abs($totalBobot - 1.0) > 0.0001) {
-                $error = 'Total bobot harus = 1 sebelum proses rekomendasi dapat dijalankan.';
+                $error = 'Total kriteria harus = 1 sebelum proses rekomendasi dapat dijalankan.';
             }
 
             return view('rekomendasi.index', [
                 'hasil'     => [],
                 'matriks'   => [],
                 'normal'    => [],
-                'bobots'    => $bobots,
+                'kriteria'    => $kriteria,
                 'suppliers' => $suppliers,
                 'error'     => $error,
             ]);
@@ -44,7 +44,7 @@ class RekomendasiController extends Controller
         $matriks = [];
         foreach ($suppliers as $s) {
             $baris = [];
-            foreach ($bobots as $b) {
+            foreach ($kriteria as $b) {
                 $kolom = $this->kolomKriteria[$b->kode] ?? null;
                 $baris[$b->kode] = $kolom ? (float)$s->$kolom : 0;
             }
@@ -53,7 +53,7 @@ class RekomendasiController extends Controller
 
         // --- STEP 2: Normalisasi matriks R ---
         $normal = [];
-        foreach ($bobots as $b) {
+        foreach ($kriteria as $b) {
             $nilaiKolom = array_column($matriks, $b->kode);
 
             if ($b->tipe === 'benefit') {
@@ -78,7 +78,7 @@ class RekomendasiController extends Controller
         $hasil = [];
         foreach ($suppliers as $s) {
             $vi = 0;
-            foreach ($bobots as $b) {
+            foreach ($kriteria as $b) {
                 $vi += (float)$b->bobot * $normal[$s->id][$b->kode];
             }
             $hasil[] = [

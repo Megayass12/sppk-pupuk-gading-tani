@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
-use App\Models\Bobot;
+use App\Models\Kriteria;
 use App\Imports\SupplierImport;
 use App\Exports\SupplierExport;
 use Illuminate\Http\Request;
@@ -78,20 +78,20 @@ class SupplierController extends Controller
             ],
         ];
 
-        $bobots = Bobot::orderBy('kode')->get();
-        if ($bobots->isEmpty()) {
+        $kriteria = Kriteria::orderBy('kode')->get();
+        if ($kriteria  ->isEmpty()) {
             return array_values($defaults);
         }
 
         $fields = [];
-        foreach ($bobots as $bobot) {
-            if (!isset($defaults[$bobot->kode])) {
+        foreach ($kriteria as $krit ) {
+            if (!isset($defaults[$krit->kode])) {
                 continue;
             }
 
-            $item = $defaults[$bobot->kode];
-            $item['label'] = $bobot->kode . ' – ' . $bobot->kriteria;
-            $item['badge'] = strtoupper($bobot->tipe);
+            $item = $defaults[$krit->kode];
+            $item['label'] = $krit->kode . ' – ' . $krit->kriteria;
+            $item['badge'] = strtoupper($krit->tipe);
             $fields[] = $item;
         }
 
@@ -147,7 +147,7 @@ class SupplierController extends Controller
     public function create()
     {
         $kriteriaFields = $this->buildSupplierKriteriaFields();
-        $unsupportedBobyts = Bobot::whereNotIn('kode', array_keys($this->supplierKodeKolom()))->get();
+        $unsupportedBobyts = Kriteria::whereNotIn('kode', array_keys($this->supplierKodeKolom()))->get();
         return view('supplier.create', compact('kriteriaFields', 'unsupportedBobyts'));
     }
 
@@ -162,7 +162,7 @@ class SupplierController extends Controller
     public function edit(Supplier $supplier)
     {
         $kriteriaFields = $this->buildSupplierKriteriaFields();
-        $unsupportedBobyts = Bobot::whereNotIn('kode', array_keys($this->supplierKodeKolom()))->get();
+        $unsupportedBobyts = Kriteria::whereNotIn('kode', array_keys($this->supplierKodeKolom()))->get();
         return view('supplier.edit', compact('supplier', 'kriteriaFields', 'unsupportedBobyts'));
     }
 
