@@ -20,15 +20,23 @@ class RekomendasiController extends Controller
     {
         $suppliers = Supplier::all();
         $bobots    = Bobot::all();
+        $totalBobot = $bobots->sum('bobot');
 
-        if ($suppliers->isEmpty() || $bobots->isEmpty()) {
+        if ($suppliers->isEmpty() || $bobots->isEmpty() || abs($totalBobot - 1.0) > 0.0001) {
+            $error = 'Data supplier atau bobot tidak lengkap. Pastikan ada supplier dan total bobot harus = 1.';
+            if ($suppliers->isEmpty() || $bobots->isEmpty()) {
+                $error = 'Data supplier atau bobot masih kosong.';
+            } elseif (abs($totalBobot - 1.0) > 0.0001) {
+                $error = 'Total bobot harus = 1 sebelum proses rekomendasi dapat dijalankan.';
+            }
+
             return view('rekomendasi.index', [
                 'hasil'     => [],
                 'matriks'   => [],
                 'normal'    => [],
                 'bobots'    => $bobots,
                 'suppliers' => $suppliers,
-                'error'     => 'Data supplier atau bobot masih kosong.',
+                'error'     => $error,
             ]);
         }
 

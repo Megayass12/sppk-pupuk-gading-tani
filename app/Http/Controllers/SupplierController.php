@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
+use App\Models\Bobot;
 use App\Imports\SupplierImport;
 use App\Exports\SupplierExport;
 use Illuminate\Http\Request;
@@ -11,6 +12,132 @@ use App\Exports\TemplateExport;
 
 class SupplierController extends Controller
 {
+    private function supplierKodeKolom(): array
+    {
+        return [
+            'C1' => 'harga',
+            'C2' => 'kualitas',
+            'C3' => 'ketepatan_waktu',
+            'C4' => 'kapasitas',
+            'C5' => 'jarak',
+        ];
+    }
+
+    private function buildSupplierKriteriaFields(): array
+    {
+        $defaults = [
+            'C1' => [
+                'kode' => 'C1',
+                'column' => 'harga',
+                'label' => 'C1 – Harga (Rp/kg)',
+                'badge' => 'COST',
+                'step' => '0.01',
+                'min' => 0,
+                'max' => null,
+                'required' => true,
+            ],
+            'C2' => [
+                'kode' => 'C2',
+                'column' => 'kualitas',
+                'label' => 'C2 – Kualitas (1–10)',
+                'badge' => 'BENEFIT',
+                'step' => '0.1',
+                'min' => 1,
+                'max' => 10,
+                'required' => true,
+            ],
+            'C3' => [
+                'kode' => 'C3',
+                'column' => 'ketepatan_waktu',
+                'label' => 'C3 – Ketepatan Waktu (%)',
+                'badge' => 'BENEFIT',
+                'step' => '1',
+                'min' => 0,
+                'max' => 100,
+                'required' => true,
+            ],
+            'C4' => [
+                'kode' => 'C4',
+                'column' => 'kapasitas',
+                'label' => 'C4 – Kapasitas (ton/bulan)',
+                'badge' => 'BENEFIT',
+                'step' => '1',
+                'min' => 0,
+                'max' => null,
+                'required' => true,
+            ],
+            'C5' => [
+                'kode' => 'C5',
+                'column' => 'jarak',
+                'label' => 'C5 – Jarak (km)',
+                'badge' => 'COST',
+                'step' => '0.01',
+                'min' => 0,
+                'max' => null,
+                'required' => true,
+            ],
+        ];
+
+        $bobots = Bobot::orderBy('kode')->get();
+        if ($bobots->isEmpty()) {
+            return array_values($defaults);
+        }
+
+        $fields = [];
+        foreach ($bobots as $bobot) {
+            if (!isset($defaults[$bobot->kode])) {
+                continue;
+            }
+
+            $item = $defaults[$bobot->kode];
+            $item['label'] = $bobot->kode . ' – ' . $bobot->kriteria;
+            $item['badge'] = strtoupper($bobot->tipe);
+            $fields[] = $item;
+        }
+
+        return empty($fields) ? array_values($defaults) : $fields;
+    }
+
+    private function supplierKriteriaRules(): array
+    {
+        $rules = [
+            'kode_supplier' => 'required|unique:suppliers',
+            'nama_supplier' => 'required',
+            'alamat'        => 'nullable|string',
+            'telepon'       => 'nullable|string',
+        ];
+
+        foreach ($this->buildSupplierKriteriaFields() as $field) {
+            switch ($field['column']) {
+                case 'kualitas':
+                    $rules[$field['column']] = 'required|numeric|min:1|max:10';
+                    break;
+                case 'ketepatan_waktu':
+                    $rules[$field['column']] = 'required|integer|min:0|max:100';
+                    break;
+                case 'kapasitas':
+                    $rules[$field['column']] = 'required|integer|min:0';
+                    break;
+                default:
+                    $rules[$field['column']] = 'required|numeric|min:0';
+                    break;
+            }
+        }
+
+        return $rules;
+    }
+
+    private function supplierKriteriaData(Request $request): array
+    {
+        $data = $request->only(['kode_supplier', 'nama_supplier', 'alamat', 'telepon']);
+
+        foreach ($this->buildSupplierKriteriaFields() as $field) {
+            $data[$field['column']] = $request->input($field['column'], 0);
+        }
+
+        return $data;
+    }
+
     public function index()
     {
         $suppliers = Supplier::latest()->paginate(10);
@@ -19,43 +146,34 @@ class SupplierController extends Controller
 
     public function create()
     {
-        return view('supplier.create');
+        $kriteriaFields = $this->buildSupplierKriteriaFields();
+        $unsupportedBobyts = Bobot::whereNotIn('kode', array_keys($this->supplierKodeKolom()))->get();
+        return view('supplier.create', compact('kriteriaFields', 'unsupportedBobyts'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'kode_supplier'  => 'required|unique:suppliers',
-            'nama_supplier'  => 'required',
-            'harga'          => 'required|numeric|min:0',
-            'kualitas'       => 'required|numeric|min:1|max:10',
-            'ketepatan_waktu'=> 'required|integer|min:0|max:100',
-            'kapasitas'      => 'required|integer|min:0',
-            'jarak'          => 'required|numeric|min:0',
-        ]);
+        $request->validate($this->supplierKriteriaRules());
 
-        Supplier::create($request->all());
+        Supplier::create($this->supplierKriteriaData($request));
         return redirect()->route('supplier.index')->with('success', 'Supplier berhasil ditambahkan.');
     }
 
     public function edit(Supplier $supplier)
     {
-        return view('supplier.edit', compact('supplier'));
+        $kriteriaFields = $this->buildSupplierKriteriaFields();
+        $unsupportedBobyts = Bobot::whereNotIn('kode', array_keys($this->supplierKodeKolom()))->get();
+        return view('supplier.edit', compact('supplier', 'kriteriaFields', 'unsupportedBobyts'));
     }
 
     public function update(Request $request, Supplier $supplier)
     {
-        $request->validate([
-            'kode_supplier'  => 'required|unique:suppliers,kode_supplier,' . $supplier->id,
-            'nama_supplier'  => 'required',
-            'harga'          => 'required|numeric|min:0',
-            'kualitas'       => 'required|numeric|min:1|max:10',
-            'ketepatan_waktu'=> 'required|integer|min:0|max:100',
-            'kapasitas'      => 'required|integer|min:0',
-            'jarak'          => 'required|numeric|min:0',
-        ]);
+        $rules = $this->supplierKriteriaRules();
+        $rules['kode_supplier'] = 'required|unique:suppliers,kode_supplier,' . $supplier->id;
 
-        $supplier->update($request->all());
+        $request->validate($rules);
+
+        $supplier->update($this->supplierKriteriaData($request));
         return redirect()->route('supplier.index')->with('success', 'Supplier berhasil diperbarui.');
     }
 
@@ -88,10 +206,10 @@ class SupplierController extends Controller
 
     // Download template Excel
     public function template()
-{
-    $headers = ['kode_supplier', 'nama_supplier', 'alamat', 'telepon', 'harga', 'kualitas', 'ketepatan_waktu', 'kapasitas', 'jarak'];
-    $contoh  = [['SUP001', 'CV. Contoh', 'Jember', '08123456789', 8000, 8.5, 90, 50, 20]];
+    {
+        $headers = ['kode_supplier', 'nama_supplier', 'alamat', 'telepon', 'harga', 'kualitas', 'ketepatan_waktu', 'kapasitas', 'jarak'];
+        $contoh  = [['SUP001', 'CV. Contoh', 'Jember', '08123456789', 8000, 8.5, 90, 50, 20]];
 
-    return Excel::download(new TemplateExport($headers, $contoh), 'template-supplier.xlsx');
-}
+        return Excel::download(new TemplateExport($headers, $contoh), 'template-supplier.xlsx');
+    }
 }

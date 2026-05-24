@@ -7,6 +7,13 @@ use Illuminate\Http\Request;
 
 class BobotController extends Controller
 {
+    private function currentBobotTotal(?int $exceptId = null): float
+    {
+        return Bobot::when($exceptId, function ($query, $exceptId) {
+            return $query->where('id', '!=', $exceptId);
+        })->sum('bobot');
+    }
+
     public function index()
     {
         $bobots = Bobot::all();
@@ -29,8 +36,17 @@ class BobotController extends Controller
             'keterangan'=> 'nullable',
         ]);
 
+        $newTotal = $this->currentBobotTotal() + (float) $request->input('bobot');
+        if ($newTotal > 1.0001) {
+            return redirect()->back()->withInput()->with('error', 'Total bobot tidak boleh lebih dari 1. Perbaiki nilai bobot atau hapus bobot lain terlebih dahulu.');
+        }
+
         Bobot::create($request->all());
-        return redirect()->route('bobot.index')->with('success', 'Kriteria bobot berhasil ditambahkan.');
+        $message = $newTotal == 1.0
+            ? 'Kriteria bobot berhasil ditambahkan.'
+            : 'Kriteria bobot tersimpan. Total bobot belum 1. Tambahkan kriteria lain agar total = 1.';
+
+        return redirect()->route('bobot.index')->with('success', $message);
     }
 
     public function edit(Bobot $bobot)
@@ -48,8 +64,17 @@ class BobotController extends Controller
             'keterangan'=> 'nullable',
         ]);
 
+        $newTotal = $this->currentBobotTotal($bobot->id) + (float) $request->input('bobot');
+        if ($newTotal > 1.0001) {
+            return redirect()->back()->withInput()->with('error', 'Total bobot tidak boleh lebih dari 1. Perbaiki nilai bobot atau hapus bobot lain terlebih dahulu.');
+        }
+
         $bobot->update($request->all());
-        return redirect()->route('bobot.index')->with('success', 'Bobot berhasil diperbarui.');
+        $message = $newTotal == 1.0
+            ? 'Bobot berhasil diperbarui.'
+            : 'Bobot diperbarui. Total bobot belum 1. Tambahkan kriteria lain agar total = 1.';
+
+        return redirect()->route('bobot.index')->with('success', $message);
     }
 
     public function destroy(Bobot $bobot)

@@ -75,6 +75,9 @@
         <div class="card-header"><i class="fa fa-info-circle me-2 text-info"></i>Panduan Bobot</div>
         <div class="card-body small text-muted">
             <p><strong>Total bobot harus = 1.0</strong></p>
+            @if($totalBobot != 1)
+                <p class="text-danger mb-2"><strong>Rekomendasi SAW terkunci sampai total bobot menjadi 1.0.</strong></p>
+            @endif
             <p><strong>BENEFIT</strong> – Nilai lebih tinggi lebih baik.<br>Contoh: Kualitas, Ketepatan Waktu, Kapasitas</p>
             <p><strong>COST</strong> – Nilai lebih rendah lebih baik.<br>Contoh: Harga, Jarak</p>
             <p>Kode kriteria harus sama dengan yang digunakan di sistem (C1–C5 untuk kolom default).</p>

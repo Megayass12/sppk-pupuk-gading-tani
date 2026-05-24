@@ -36,41 +36,26 @@
                 <div class="col-12"><hr><p class="fw-semibold text-success mb-0"><i class="fa fa-chart-bar me-1"></i>Data Kriteria SAW</p>
                 <small class="text-muted">Isi nilai sesuai kondisi aktual supplier</small></div>
 
-                <div class="col-md-4">
-                    <label class="form-label">C1 – Harga (Rp/kg) <span class="text-danger">*</span>
-                        <span class="badge badge-cost ms-1">COST</span></label>
-                    <input type="number" name="harga" class="form-control @error('harga') is-invalid @enderror"
-                           value="{{ old('harga') }}" placeholder="8500" min="0" required>
-                    @error('harga')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                @if(isset($unsupportedBobyts) && $unsupportedBobyts->isNotEmpty())
+                <div class="col-12">
+                    <div class="alert alert-warning mb-3">
+                        <i class="fa fa-exclamation-triangle me-2"></i>Beberapa kriteria tidak didukung oleh tabel supplier saat ini:
+                        {{ $unsupportedBobyts->pluck('kode')->implode(', ') }}.
+                        Silakan gunakan kode C1–C5 atau perbarui schema supplier.
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">C2 – Kualitas (1–10) <span class="text-danger">*</span>
-                        <span class="badge badge-benefit ms-1">BENEFIT</span></label>
-                    <input type="number" name="kualitas" class="form-control @error('kualitas') is-invalid @enderror"
-                           value="{{ old('kualitas') }}" step="0.1" min="1" max="10" placeholder="8.5" required>
-                    @error('kualitas')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                @endif
+
+                @foreach($kriteriaFields as $field)
+                <div class="{{ in_array($field['column'], ['harga','kualitas','ketepatan_waktu']) ? 'col-md-4' : 'col-md-6' }}">
+                    <label class="form-label">{{ $field['label'] }} <span class="text-danger">*</span>
+                        <span class="badge {{ $field['badge'] === 'BENEFIT' ? 'badge-benefit' : 'badge-cost' }} ms-1">{{ $field['badge'] }}</span></label>
+                    <input type="number" name="{{ $field['column'] }}" class="form-control @error($field['column']) is-invalid @enderror"
+                           value="{{ old($field['column']) }}" step="{{ $field['step'] }}" min="{{ $field['min'] }}"
+                           @if($field['max'] !== null) max="{{ $field['max'] }}" @endif placeholder="" required>
+                    @error($field['column'])<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">C3 – Ketepatan Waktu (%) <span class="text-danger">*</span>
-                        <span class="badge badge-benefit ms-1">BENEFIT</span></label>
-                    <input type="number" name="ketepatan_waktu" class="form-control @error('ketepatan_waktu') is-invalid @enderror"
-                           value="{{ old('ketepatan_waktu') }}" min="0" max="100" placeholder="90" required>
-                    @error('ketepatan_waktu')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">C4 – Kapasitas (ton/bulan) <span class="text-danger">*</span>
-                        <span class="badge badge-benefit ms-1">BENEFIT</span></label>
-                    <input type="number" name="kapasitas" class="form-control @error('kapasitas') is-invalid @enderror"
-                           value="{{ old('kapasitas') }}" min="0" placeholder="50" required>
-                    @error('kapasitas')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">C5 – Jarak (km) <span class="text-danger">*</span>
-                        <span class="badge badge-cost ms-1">COST</span></label>
-                    <input type="number" name="jarak" class="form-control @error('jarak') is-invalid @enderror"
-                           value="{{ old('jarak') }}" step="0.1" min="0" placeholder="20" required>
-                    @error('jarak')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
+                @endforeach
 
                 <div class="col-12 d-flex gap-2">
                     <button type="submit" class="btn btn-hijau"><i class="fa fa-save me-1"></i>Simpan</button>

@@ -33,6 +33,11 @@
             color: #fff; background: rgba(255,255,255,0.15);
             border-left: 3px solid var(--hijau-muda);
         }
+        .sidebar .nav-link.disabled {
+            color: rgba(255,255,255,0.45);
+            opacity: 0.7;
+            pointer-events: none;
+        }
         .sidebar .nav-label {
             font-size: 10px; color: rgba(255,255,255,0.4);
             padding: 16px 20px 6px; text-transform: uppercase; letter-spacing: 1px;
@@ -85,8 +90,14 @@
         <i class="fa fa-sliders fa-fw"></i> Bobot Kriteria
     </a>
     <div class="nav-label">Hasil</div>
-    <a href="{{ route('rekomendasi.index') }}"
-       class="nav-link {{ request()->routeIs('rekomendasi.*') ? 'active' : '' }}">
+    @php
+        $totalBobots = \App\Models\Bobot::sum('bobot');
+        $supplierCount = \App\Models\Supplier::count();
+        $rekomendasiLocked = $totalBobots != 1.0 || $supplierCount === 0;
+    @endphp
+    <a href="{{ $rekomendasiLocked ? '#' : route('rekomendasi.index') }}"
+       class="nav-link {{ request()->routeIs('rekomendasi.*') ? 'active' : '' }} {{ $rekomendasiLocked ? 'disabled' : '' }}"
+       @if($rekomendasiLocked) title="Menu rekomendasi terkunci sampai total bobot = 1 dan ada supplier" @endif>
         <i class="fa fa-star fa-fw"></i> Rekomendasi SAW
     </a>
 </div>

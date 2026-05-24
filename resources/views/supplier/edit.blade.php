@@ -35,26 +35,26 @@
 
                 <div class="col-12"><hr><p class="fw-semibold text-success mb-0"><i class="fa fa-chart-bar me-1"></i>Data Kriteria SAW</p></div>
 
-                <div class="col-md-4">
-                    <label class="form-label">C1 – Harga (Rp/kg) <span class="badge badge-cost ms-1">COST</span></label>
-                    <input type="number" name="harga" class="form-control" value="{{ old('harga', $supplier->harga) }}" min="0" required>
+                @if(isset($unsupportedBobyts) && $unsupportedBobyts->isNotEmpty())
+                <div class="col-12">
+                    <div class="alert alert-warning mb-3">
+                        <i class="fa fa-exclamation-triangle me-2"></i>Beberapa kriteria tidak didukung oleh tabel supplier saat ini:
+                        {{ $unsupportedBobyts->pluck('kode')->implode(', ') }}.
+                        Silakan gunakan kode C1–C5 atau perbarui schema supplier.
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">C2 – Kualitas (1–10) <span class="badge badge-benefit ms-1">BENEFIT</span></label>
-                    <input type="number" name="kualitas" class="form-control" value="{{ old('kualitas', $supplier->kualitas) }}" step="0.1" min="1" max="10" required>
+                @endif
+
+                @foreach($kriteriaFields as $field)
+                <div class="{{ in_array($field['column'], ['harga','kualitas','ketepatan_waktu']) ? 'col-md-4' : 'col-md-6' }}">
+                    <label class="form-label">{{ $field['label'] }}
+                        <span class="badge {{ $field['badge'] === 'BENEFIT' ? 'badge-benefit' : 'badge-cost' }} ms-1">{{ $field['badge'] }}</span></label>
+                    <input type="number" name="{{ $field['column'] }}" class="form-control @error($field['column']) is-invalid @enderror"
+                           value="{{ old($field['column'], $supplier->{$field['column']}) }}" step="{{ $field['step'] }}" min="{{ $field['min'] }}"
+                           @if($field['max'] !== null) max="{{ $field['max'] }}" @endif required>
+                    @error($field['column'])<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">C3 – Ketepatan Waktu (%) <span class="badge badge-benefit ms-1">BENEFIT</span></label>
-                    <input type="number" name="ketepatan_waktu" class="form-control" value="{{ old('ketepatan_waktu', $supplier->ketepatan_waktu) }}" min="0" max="100" required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">C4 – Kapasitas (ton/bulan) <span class="badge badge-benefit ms-1">BENEFIT</span></label>
-                    <input type="number" name="kapasitas" class="form-control" value="{{ old('kapasitas', $supplier->kapasitas) }}" min="0" required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">C5 – Jarak (km) <span class="badge badge-cost ms-1">COST</span></label>
-                    <input type="number" name="jarak" class="form-control" value="{{ old('jarak', $supplier->jarak) }}" step="0.1" min="0" required>
-                </div>
+                @endforeach
 
                 <div class="col-12 d-flex gap-2">
                     <button type="submit" class="btn btn-warning"><i class="fa fa-save me-1"></i>Update</button>
