@@ -10,14 +10,15 @@ class Supplier extends Model
     use HasFactory;
 
     protected $fillable = [
-        'kode_supplier',
+        'kode',
         'nama_supplier',
         'alamat',
-        'telepon',
-        'harga',
-        'kualitas',
-        'ketepatan_waktu',
-        'kapasitas',
-        'jarak',
+        'no_telp',
+        'email',
     ];
+
+    public function penilaian()
+    {
+        return $this->hasMany(PenilaianSupplier::class);
+    }
 }

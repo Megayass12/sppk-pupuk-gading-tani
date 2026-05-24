@@ -2,32 +2,57 @@
 
 namespace App\Imports;
 
+use App\Models\Kriteria;
+use App\Models\PenilaianSupplier;
 use App\Models\Supplier;
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\SkipsOnError;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\SkipsErrors;
+use Maatwebsite\Excel\Concerns\SkipsOnError;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 
-class SupplierImport implements ToModel, WithHeadingRow, SkipsOnError
+class SupplierImport implements ToCollection, WithHeadingRow, SkipsOnError
 {
     use SkipsErrors;
 
-    public function model(array $row)
+    public function __construct()
     {
-        if (empty($row['kode_supplier'])) return null;
+        HeadingRowFormatter::default('none');
+    }
 
-        return Supplier::updateOrCreate(
-            ['kode_supplier' => $row['kode_supplier']],
-            [
-                'nama_supplier'   => $row['nama_supplier']   ?? '',
-                'alamat'          => $row['alamat']          ?? '',
-                'telepon'         => $row['telepon']         ?? '',
-                'harga'           => $row['harga']           ?? 0,
-                'kualitas'        => $row['kualitas']        ?? 0,
-                'ketepatan_waktu' => $row['ketepatan_waktu'] ?? 0,
-                'kapasitas'       => $row['kapasitas']       ?? 0,
-                'jarak'           => $row['jarak']           ?? 0,
-            ]
-        );
+    public function collection(Collection $rows)
+    {
+        $kriteriaHeadings = Kriteria::orderBy('id')
+            ->get()
+            ->mapWithKeys(fn($item) => ['Kriteria: ' . $item->nama_kriteria => $item->id])
+            ->toArray();
+
+        foreach ($rows as $row) {
+            if (empty($row['kode'])) {
+                continue;
+            }
+
+            $supplier = Supplier::updateOrCreate(
+                ['kode' => $row['kode']],
+                [
+                    'nama_supplier' => $row['nama_supplier'] ?? '',
+                    'alamat' => $row['alamat'] ?? '',
+                    'no_telp' => $row['no_telp'] ?? '',
+                    'email' => $row['email'] ?? '',
+                ]
+            );
+
+            foreach ($kriteriaHeadings as $heading => $kriteriaId) {
+                if (!isset($row[$heading])) {
+                    continue;
+                }
+
+                PenilaianSupplier::updateOrCreate(
+                    ['supplier_id' => $supplier->id, 'kriteria_id' => $kriteriaId],
+                    ['nilai' => (float) $row[$heading]]
+                );
+            }
+        }
     }
 }

@@ -7,7 +7,6 @@
 <div class="alert alert-warning"><i class="fa fa-exclamation-triangle me-2"></i>{{ $error }}</div>
 @endif
 
-{{-- Kartu Pemenang (Top 3) --}}
 @if(count($hasil) >= 1)
 <div class="row g-3 mb-4">
     @foreach(array_slice($hasil, 0, 3) as $h)
@@ -21,7 +20,7 @@
                     @endif
                 </div>
                 <h6 class="fw-bold mb-1">{{ $h['supplier']->nama_supplier }}</h6>
-                <small class="text-muted d-block mb-2">{{ $h['supplier']->kode_supplier }} &mdash; {{ $h['supplier']->alamat }}</small>
+                <small class="text-muted d-block mb-2">{{ $h['supplier']->kode }} &mdash; {{ $h['supplier']->alamat }}</small>
                 <span class="badge bg-success fs-6 px-3 py-2">Vi = {{ $h['vi'] }}</span>
             </div>
         </div>
@@ -30,7 +29,6 @@
 </div>
 @endif
 
-{{-- Tabel Ranking Lengkap --}}
 <div class="card mb-4">
     <div class="card-header">
         <i class="fa fa-star me-2 text-warning"></i>Hasil Perankingan Supplier (Metode SAW)
@@ -41,10 +39,10 @@
                 <tr>
                     <th class="text-center">Rank</th>
                     <th>Supplier</th>
-                    @foreach($bobots as $b)
-                    <th class="text-center" title="{{ $b->keterangan }}">
-                        {{ $b->kode }}<br>
-                        <small class="fw-normal text-muted">w={{ $b->bobot }}</small>
+                    @foreach($kriteria as $krit)
+                    <th class="text-center" title="{{ $krit->nama_kriteria }}">
+                        C{{ $loop->iteration }}<br>
+                        <small class="fw-normal text-muted">w={{ $krit->bobot }}</small>
                     </th>
                     @endforeach
                     <th class="text-center">Nilai Vi</th>
@@ -62,12 +60,13 @@
                     </td>
                     <td>
                         <strong>{{ $h['supplier']->nama_supplier }}</strong>
-                        <small class="text-muted d-block">{{ $h['supplier']->kode_supplier }}</small>
+                        <small class="text-muted d-block">{{ $h['supplier']->kode }}</small>
                     </td>
-                    @foreach($bobots as $b)
+                    @foreach($kriteria as $krit)
+                    @php $kode = 'C'.$loop->iteration; @endphp
                     <td class="text-center">
-                        <small class="text-muted d-block">{{ number_format($h['matriks'][$b->kode] ?? 0, 2) }}</small>
-                        <strong>{{ number_format($h['normal'][$b->kode] ?? 0, 4) }}</strong>
+                        <small class="text-muted d-block">{{ number_format($h['matriks'][$kode] ?? 0, 2) }}</small>
+                        <strong>{{ number_format($h['normal'][$kode] ?? 0, 4) }}</strong>
                     </td>
                     @endforeach
                     <td class="text-center">
@@ -83,7 +82,6 @@
     </div>
 </div>
 
-{{-- Penjelasan Perhitungan --}}
 <div class="card">
     <div class="card-header" data-bs-toggle="collapse" data-bs-target="#langkahSAW" style="cursor:pointer">
         <i class="fa fa-calculator me-2 text-info"></i>Langkah Perhitungan SAW
@@ -100,9 +98,9 @@
             <p class="small">Vi = Σ (wj × rij) → jumlah dari (bobot × nilai normalisasi) semua kriteria</p>
             <h6 class="mt-3">Bobot yang Digunakan:</h6>
             <ul class="small">
-                @foreach($bobots as $b)
-                <li>{{ $b->kode }} – {{ $b->kriteria }}: <strong>{{ $b->bobot }}</strong>
-                    <span class="badge {{ $b->tipe === 'benefit' ? 'badge-benefit' : 'badge-cost' }} ms-1">{{ strtoupper($b->tipe) }}</span>
+                @foreach($kriteria as $krit)
+                <li>C{{ $loop->iteration }} – {{ $krit->nama_kriteria }}: <strong>{{ $krit->bobot }}</strong>
+                    <span class="badge {{ $krit->atribut === 'benefit' ? 'badge-benefit' : 'badge-cost' }} ms-1">{{ strtoupper($krit->atribut) }}</span>
                 </li>
                 @endforeach
             </ul>

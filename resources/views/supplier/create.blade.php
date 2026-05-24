@@ -13,10 +13,10 @@
             @csrf
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label class="form-label fw-semibold">Kode Supplier <span class="text-danger">*</span></label>
-                    <input type="text" name="kode_supplier" class="form-control @error('kode_supplier') is-invalid @enderror"
-                           value="{{ old('kode_supplier') }}" placeholder="SUP001" required>
-                    @error('kode_supplier')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    <label class="form-label fw-semibold">Kode <span class="text-danger">*</span></label>
+                    <input type="text" name="kode" class="form-control @error('kode') is-invalid @enderror"
+                           value="{{ old('kode') }}" placeholder="S001" required>
+                    @error('kode')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="col-md-8">
                     <label class="form-label fw-semibold">Nama Supplier <span class="text-danger">*</span></label>
@@ -29,48 +29,31 @@
                     <input type="text" name="alamat" class="form-control" value="{{ old('alamat') }}" placeholder="Kota/Kabupaten">
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label fw-semibold">Telepon</label>
-                    <input type="text" name="telepon" class="form-control" value="{{ old('telepon') }}" placeholder="08xx">
+                    <label class="form-label fw-semibold">No. Telp</label>
+                    <input type="text" name="no_telp" class="form-control" value="{{ old('no_telp') }}" placeholder="08xx">
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label fw-semibold">Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="email@domain.com">
                 </div>
 
                 <div class="col-12"><hr><p class="fw-semibold text-success mb-0"><i class="fa fa-chart-bar me-1"></i>Data Kriteria SAW</p>
                 <small class="text-muted">Isi nilai sesuai kondisi aktual supplier</small></div>
 
-                <div class="col-md-4">
-                    <label class="form-label">C1 – Harga (Rp/kg) <span class="text-danger">*</span>
-                        <span class="badge badge-cost ms-1">COST</span></label>
-                    <input type="number" name="harga" class="form-control @error('harga') is-invalid @enderror"
-                           value="{{ old('harga') }}" placeholder="8500" min="0" required>
-                    @error('harga')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">C2 – Kualitas (1–10) <span class="text-danger">*</span>
-                        <span class="badge badge-benefit ms-1">BENEFIT</span></label>
-                    <input type="number" name="kualitas" class="form-control @error('kualitas') is-invalid @enderror"
-                           value="{{ old('kualitas') }}" step="0.1" min="1" max="10" placeholder="8.5" required>
-                    @error('kualitas')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">C3 – Ketepatan Waktu (%) <span class="text-danger">*</span>
-                        <span class="badge badge-benefit ms-1">BENEFIT</span></label>
-                    <input type="number" name="ketepatan_waktu" class="form-control @error('ketepatan_waktu') is-invalid @enderror"
-                           value="{{ old('ketepatan_waktu') }}" min="0" max="100" placeholder="90" required>
-                    @error('ketepatan_waktu')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
+                @forelse($kriteriaFields as $field)
                 <div class="col-md-6">
-                    <label class="form-label">C4 – Kapasitas (ton/bulan) <span class="text-danger">*</span>
-                        <span class="badge badge-benefit ms-1">BENEFIT</span></label>
-                    <input type="number" name="kapasitas" class="form-control @error('kapasitas') is-invalid @enderror"
-                           value="{{ old('kapasitas') }}" min="0" placeholder="50" required>
-                    @error('kapasitas')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    <label class="form-label">{{ $field['label'] }} <span class="text-danger">*</span>
+                        <span class="badge {{ $field['badge'] === 'BENEFIT' ? 'badge-benefit' : 'badge-cost' }} ms-1">{{ $field['badge'] }}</span></label>
+                    <input type="number" name="{{ $field['name'] }}" class="form-control @error('nilai.' . $field['id']) is-invalid @enderror"
+                           value="{{ old('nilai.' . $field['id']) }}" step="{{ $field['step'] }}" min="{{ $field['min'] }}"
+                           @if($field['max'] !== null) max="{{ $field['max'] }}" @endif required>
+                    @error('nilai.' . $field['id'])<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">C5 – Jarak (km) <span class="text-danger">*</span>
-                        <span class="badge badge-cost ms-1">COST</span></label>
-                    <input type="number" name="jarak" class="form-control @error('jarak') is-invalid @enderror"
-                           value="{{ old('jarak') }}" step="0.1" min="0" placeholder="20" required>
-                    @error('jarak')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                @empty
+                <div class="col-12">
+                    <div class="alert alert-warning">Belum ada kriteria. Tambahkan kriteria terlebih dahulu sebelum memasukkan supplier.</div>
                 </div>
+                @endforelse
 
                 <div class="col-12 d-flex gap-2">
                     <button type="submit" class="btn btn-hijau"><i class="fa fa-save me-1"></i>Simpan</button>

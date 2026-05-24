@@ -27,25 +27,26 @@
                     <th>Kode</th>
                     <th>Nama Supplier</th>
                     <th>Alamat</th>
-                    <th class="text-end">Harga (Rp/kg)</th>
-                    <th class="text-center">Kualitas</th>
-                    <th class="text-center">Ketepatan (%)</th>
-                    <th class="text-center">Kapasitas (ton)</th>
-                    <th class="text-center">Jarak (km)</th>
+                    <th>No. Telp</th>
+                    <th>Email</th>
+                    @foreach($kriteria as $krit)
+                    <th class="text-center">C{{ $loop->iteration }}<br><small>{{ $krit->nama_kriteria }}</small></th>
+                    @endforeach
                     <th class="text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($suppliers as $s)
                 <tr>
-                    <td><span class="badge bg-secondary">{{ $s->kode_supplier }}</span></td>
+                    <td><span class="badge bg-secondary">{{ $s->kode }}</span></td>
                     <td><strong>{{ $s->nama_supplier }}</strong></td>
                     <td class="text-muted">{{ $s->alamat }}</td>
-                    <td class="text-end">{{ number_format($s->harga, 0, ',', '.') }}</td>
-                    <td class="text-center">{{ $s->kualitas }}</td>
-                    <td class="text-center">{{ $s->ketepatan_waktu }}%</td>
-                    <td class="text-center">{{ $s->kapasitas }}</td>
-                    <td class="text-center">{{ $s->jarak }}</td>
+                    <td>{{ $s->no_telp }}</td>
+                    <td>{{ $s->email }}</td>
+                    @foreach($kriteria as $krit)
+                    @php $nilai = optional($s->penilaian->where('kriteria_id', $krit->id)->first())->nilai ?? 0; @endphp
+                    <td class="text-center">{{ $nilai }}</td>
+                    @endforeach
                     <td class="text-center">
                         <a href="{{ route('supplier.edit', $s) }}" class="btn btn-xs btn-outline-warning btn-sm">
                             <i class="fa fa-edit"></i>
@@ -60,7 +61,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="9" class="text-center text-muted py-4">Belum ada data supplier.</td></tr>
+                <tr><td colspan="{{ 5 + $kriteria->count() + 1 }}" class="text-center text-muted py-4">Belum ada data supplier.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -84,7 +85,7 @@
                     <div class="alert alert-info small mb-3">
                         <i class="fa fa-info-circle me-1"></i>
                         Download <a href="{{ route('supplier.template') }}">template Excel</a> terlebih dahulu.
-                        Kolom yang diperlukan: kode_supplier, nama_supplier, alamat, telepon, harga, kualitas, ketepatan_waktu, kapasitas, jarak.
+                        Gunakan kolom: kode, nama_supplier, alamat, no_telp, email, dan setiap kriteria aktif sebagai "Kriteria: Nama Kriteria".
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Pilih File Excel <span class="text-danger">*</span></label>
