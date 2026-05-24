@@ -91,13 +91,13 @@
     </a>
     <div class="nav-label">Hasil</div>
     @php
-        $totalBobots = \App\Models\Bobot::sum('bobot');
+        $totalBobots = \App\Models\Kriteria::sum('bobot');
         $supplierCount = \App\Models\Supplier::count();
-        $rekomendasiLocked = $totalBobots != 1.0 || $supplierCount === 0;
+        $rekomendasiLocked = abs($totalBobots - 1.0) > 0.0001 || $supplierCount === 0;
     @endphp
     <a href="{{ $rekomendasiLocked ? '#' : route('rekomendasi.index') }}"
        class="nav-link {{ request()->routeIs('rekomendasi.*') ? 'active' : '' }} {{ $rekomendasiLocked ? 'disabled' : '' }}"
-       @if($rekomendasiLocked) title="Menu rekomendasi terkunci sampai total bobot = 1 dan ada supplier" @endif>
+       @if($rekomendasiLocked) title="Menu rekomendasi terkunci. Pastikan total bobot = 1 dan ada supplier." @endif>
         <i class="fa fa-star fa-fw"></i> Rekomendasi SAW
     </a>
 </div>

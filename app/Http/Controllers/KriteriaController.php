@@ -16,7 +16,7 @@ class KriteriaController extends Controller
 
     public function index()
     {
-        $kriteria = Kriteria::all();
+        $kriteria = Kriteria::orderBy('id')->get();
         $totalKriteria = $kriteria->sum('bobot');
         return view('bobot.index', compact('kriteria', 'totalKriteria'));
     }
@@ -29,22 +29,20 @@ class KriteriaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'kode'      => 'required|unique:kriteria',
-            'kriteria'  => 'required',
-            'tipe'      => 'required|in:benefit,cost',
-            'bobot'     => 'required|numeric|min:0|max:1',
-            'keterangan'=> 'nullable',
+            'nama_kriteria' => 'required|unique:kriterias,nama_kriteria',
+            'atribut'       => 'required|in:benefit,cost',
+            'bobot'         => 'required|numeric|min:0|max:1',
         ]);
 
         $newTotal = $this->currentKriteriaTotal() + (float) $request->input('bobot');
         if ($newTotal > 1.0001) {
-            return redirect()->back()->withInput()->with('error', 'Total bobot tidak boleh lebih dari 1. Perbaiki nilai bobot atau hapus bobot lain terlebih dahulu.');
+            return redirect()->back()->withInput()->with('error', 'Total bobot tidak boleh lebih dari 1. Perbaiki nilai bobot atau hapus kriteria lain terlebih dahulu.');
         }
 
-        Kriteria::create($request->all());
+        Kriteria::create($request->only(['nama_kriteria', 'atribut', 'bobot']));
         $message = $newTotal == 1.0
-            ? 'Kriteria bobot berhasil ditambahkan.'
-            : 'Kriteria bobot tersimpan. Total bobot belum 1. Tambahkan kriteria lain agar total = 1.';
+            ? 'Kriteria berhasil ditambahkan.'
+            : 'Kriteria tersimpan. Total bobot belum 1. Tambahkan kriteria lain agar total = 1.';
 
         return redirect()->route('bobot.index')->with('success', $message);
     }
@@ -57,22 +55,20 @@ class KriteriaController extends Controller
     public function update(Request $request, Kriteria $bobot)
     {
         $request->validate([
-            'kode'      => 'required|unique:kriteria,kode,' . $bobot->id,
-            'kriteria'  => 'required',
-            'tipe'      => 'required|in:benefit,cost',
-            'bobot'     => 'required|numeric|min:0|max:1',
-            'keterangan'=> 'nullable',
+            'nama_kriteria' => 'required|unique:kriterias,nama_kriteria,' . $bobot->id,
+            'atribut'       => 'required|in:benefit,cost',
+            'bobot'         => 'required|numeric|min:0|max:1',
         ]);
 
         $newTotal = $this->currentKriteriaTotal($bobot->id) + (float) $request->input('bobot');
         if ($newTotal > 1.0001) {
-            return redirect()->back()->withInput()->with('error', 'Total bobot tidak boleh lebih dari 1. Perbaiki nilai bobot atau hapus bobot lain terlebih dahulu.');
+            return redirect()->back()->withInput()->with('error', 'Total bobot tidak boleh lebih dari 1. Perbaiki nilai bobot atau hapus kriteria lain terlebih dahulu.');
         }
 
-        $bobot->update($request->all());
+        $bobot->update($request->only(['nama_kriteria', 'atribut', 'bobot']));
         $message = $newTotal == 1.0
-            ? 'Kriteria bobot berhasil diperbarui.'
-            : 'Kriteria bobot diperbarui. Total bobot belum 1. Tambahkan kriteria lain agar total = 1.';
+            ? 'Kriteria berhasil diperbarui.'
+            : 'Kriteria diperbarui. Total bobot belum 1. Tambahkan kriteria lain agar total = 1.';
 
         return redirect()->route('bobot.index')->with('success', $message);
     }
@@ -80,6 +76,6 @@ class KriteriaController extends Controller
     public function destroy(Kriteria $bobot)
     {
         $bobot->delete();
-        return redirect()->route('bobot.index')->with('success', 'Bobot berhasil dihapus.');
+        return redirect()->route('bobot.index')->with('success', 'Kriteria berhasil dihapus.');
     }
 }

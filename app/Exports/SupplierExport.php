@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\Kriteria;
 use App\Models\Supplier;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -11,29 +12,33 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
 {
     public function collection()
     {
-        return Supplier::all();
+        return Supplier::with('penilaian')->get();
     }
 
     public function headings(): array
     {
-        return [
-            'kode_supplier', 'nama_supplier', 'alamat', 'telepon',
-            'harga', 'kualitas', 'ketepatan_waktu', 'kapasitas', 'jarak',
-        ];
+        $kriteria = Kriteria::orderBy('id')->get();
+
+        return array_merge(
+            ['kode', 'nama_supplier', 'alamat', 'no_telp', 'email'],
+            $kriteria->map(fn($item) => 'Kriteria: ' . $item->nama_kriteria)->toArray()
+        );
     }
 
     public function map($row): array
     {
-        return [
-            $row->kode_supplier,
-            $row->nama_supplier,
-            $row->alamat,
-            $row->telepon,
-            $row->harga,
-            $row->kualitas,
-            $row->ketepatan_waktu,
-            $row->kapasitas,
-            $row->jarak,
-        ];
+        $nilaiMap = $row->penilaian->pluck('nilai', 'kriteria_id')->toArray();
+        $kriteria = Kriteria::orderBy('id')->get();
+
+        return array_merge(
+            [
+                $row->kode,
+                $row->nama_supplier,
+                $row->alamat,
+                $row->no_telp,
+                $row->email,
+            ],
+            $kriteria->map(fn($item) => $nilaiMap[$item->id] ?? 0)->toArray()
+        );
     }
 }

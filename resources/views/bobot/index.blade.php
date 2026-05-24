@@ -16,27 +16,25 @@
             <thead>
                 <tr>
                     <th>Kode</th>
-                    <th>Kriteria</th>
-                    <th class="text-center">Tipe</th>
+                    <th>Nama Kriteria</th>
+                    <th class="text-center">Atribut</th>
                     <th class="text-center">Bobot</th>
-                    <th>Keterangan</th>
                     <th class="text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($bobots as $b)
+                @forelse($kriteria as $b)
                 <tr>
-                    <td><strong>{{ $b->kode }}</strong></td>
-                    <td>{{ $b->kriteria }}</td>
+                    <td><strong>C{{ $loop->iteration }}</strong></td>
+                    <td>{{ $b->nama_kriteria }}</td>
                     <td class="text-center">
-                        @if($b->tipe === 'benefit')
+                        @if($b->atribut === 'benefit')
                             <span class="badge badge-benefit px-2 py-1">BENEFIT</span>
                         @else
                             <span class="badge badge-cost px-2 py-1">COST</span>
                         @endif
                     </td>
                     <td class="text-center fw-bold">{{ $b->bobot }}</td>
-                    <td class="text-muted small">{{ $b->keterangan }}</td>
                     <td class="text-center">
                         <a href="{{ route('bobot.edit', $b) }}" class="btn btn-sm btn-outline-warning">
                             <i class="fa fa-edit"></i>
@@ -49,21 +47,21 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" class="text-center text-muted py-4">Belum ada data bobot.</td></tr>
+                <tr><td colspan="5" class="text-center text-muted py-4">Belum ada data kriteria.</td></tr>
                 @endforelse
             </tbody>
             <tfoot>
                 <tr class="table-light">
                     <td colspan="3" class="text-end fw-bold">Total Bobot:</td>
-                    <td class="text-center fw-bold {{ $totalBobot == 1 ? 'text-success' : 'text-danger' }}">
-                        {{ $totalBobot }}
-                        @if($totalBobot != 1)
+                    <td class="text-center fw-bold {{ abs($totalKriteria - 1) < 0.0001 ? 'text-success' : 'text-danger' }}">
+                        {{ $totalKriteria }}
+                        @if(abs($totalKriteria - 1) > 0.0001)
                             <i class="fa fa-exclamation-triangle ms-1" title="Total bobot harus = 1"></i>
                         @else
                             <i class="fa fa-check-circle ms-1"></i>
                         @endif
                     </td>
-                    <td colspan="2"></td>
+                    <td></td>
                 </tr>
             </tfoot>
         </table>
@@ -72,15 +70,12 @@
 </div>
 <div class="col-lg-4">
     <div class="card">
-        <div class="card-header"><i class="fa fa-info-circle me-2 text-info"></i>Panduan Bobot</div>
+        <div class="card-header"><i class="fa fa-info-circle me-2 text-info"></i>Panduan Kriteria</div>
         <div class="card-body small text-muted">
             <p><strong>Total bobot harus = 1.0</strong></p>
-            @if($totalBobot != 1)
-                <p class="text-danger mb-2"><strong>Rekomendasi SAW terkunci sampai total bobot menjadi 1.0.</strong></p>
-            @endif
-            <p><strong>BENEFIT</strong> – Nilai lebih tinggi lebih baik.<br>Contoh: Kualitas, Ketepatan Waktu, Kapasitas</p>
-            <p><strong>COST</strong> – Nilai lebih rendah lebih baik.<br>Contoh: Harga, Jarak</p>
-            <p>Kode kriteria harus sama dengan yang digunakan di sistem (C1–C5 untuk kolom default).</p>
+            <p><strong>BENEFIT</strong> – Nilai lebih tinggi lebih baik.</p>
+            <p><strong>COST</strong> – Nilai lebih rendah lebih baik.</p>
+            <p>Nama kriteria akan digunakan sebagai label dinamis pada penilaian supplier.</p>
         </div>
     </div>
 </div>
