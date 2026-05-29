@@ -80,16 +80,16 @@
         <h6><i class="fa fa-leaf me-2"></i>UD. Gading Tani</h6>
         <small>SPK Pemilihan Supplier Pupuk</small>
     </div>
-    <div class="nav-label">Menu</div>
+    <div class="nav-label">Menu Utama</div>
     <a href="{{ route('supplier.index') }}"
        class="nav-link {{ request()->routeIs('supplier.*') ? 'active' : '' }}">
-        <i class="fa fa-truck fa-fw"></i> Data Supplier
+        <i class="fa fa-building fa-fw"></i> Daftar Supplier
     </a>
     <a href="{{ route('bobot.index') }}"
        class="nav-link {{ request()->routeIs('bobot.*') ? 'active' : '' }}">
-        <i class="fa fa-sliders fa-fw"></i> Bobot Kriteria
+        <i class="fa fa-cog fa-fw"></i> Pengaturan Penilaian
     </a>
-    <div class="nav-label">Hasil</div>
+    <div class="nav-label">Hasil Analisis</div>
     @php
         $totalBobots = \App\Models\Kriteria::sum('bobot');
         $supplierCount = \App\Models\Supplier::count();
@@ -97,16 +97,30 @@
     @endphp
     <a href="{{ $rekomendasiLocked ? '#' : route('rekomendasi.index') }}"
        class="nav-link {{ request()->routeIs('rekomendasi.*') ? 'active' : '' }} {{ $rekomendasiLocked ? 'disabled' : '' }}"
-       @if($rekomendasiLocked) title="Menu rekomendasi terkunci. Pastikan total bobot = 1 dan ada supplier." @endif>
-        <i class="fa fa-star fa-fw"></i> Rekomendasi SAW
+       @if($rekomendasiLocked) title="Untuk melihat rekomendasi, pastikan total bobot pengaturan = 100% dan ada data supplier." @endif>
+        <i class="fa fa-award fa-fw"></i> Rekomendasi Supplier
     </a>
 </div>
 
 <!-- Main content -->
 <div class="main-content">
     <div class="topbar">
-        <h5>@yield('title', 'Dashboard')</h5>
-        <small class="text-muted">Sistem Pendukung Keputusan &mdash; Metode SAW</small>
+        <div>
+            <h5>@yield('title', 'Dashboard')</h5>
+            <small class="text-muted">Aplikasi Pemilihan Supplier Pupuk</small>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <div class="text-end">
+                <small class="text-muted d-block">Login sebagai</small>
+                <strong class="text-hijau">{{ Auth::user()->name }}</strong>
+            </div>
+            <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                @csrf
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                    <i class="fa fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
+        </div>
     </div>
 
     {{-- Flash messages --}}
