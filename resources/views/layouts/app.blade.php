@@ -114,12 +114,9 @@
                 <small class="text-muted d-block">Login sebagai</small>
                 <strong class="text-hijau">{{ Auth::user()->name }}</strong>
             </div>
-            <form action="{{ route('logout') }}" method="POST" style="display: inline;">
-                @csrf
-                <button type="submit" class="btn btn-outline-danger btn-sm">
-                    <i class="fa fa-sign-out-alt"></i> Logout
-                </button>
-            </form>
+            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalLogout">
+                <i class="fa fa-sign-out-alt"></i> Logout
+            </button>
         </div>
     </div>
 
@@ -142,5 +139,37 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @stack('scripts')
+    <!-- Modal Konfirmasi Logout -->
+    <div class="modal fade" id="modalLogout" tabindex="-1" aria-labelledby="modalLogoutLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+        <div class="modal-content border-0 shadow" style="border-radius: 12px;">
+
+        <div class="modal-body text-center px-4 pt-4 pb-3">
+            <div style="width: 60px; height: 60px; border-radius: 50%; background: #ffe0e0;
+                        display: flex; align-items: center; justify-content: center;
+                        margin: 0 auto 16px;">
+            <i class="fa fa-sign-out-alt fa-lg" style="color: #c0392b;"></i>
+            </div>
+            <h6 class="fw-bold mb-1" style="color: #1a1a1a;">Keluar dari website?</h6>
+            <p class="text-muted mb-0" style="font-size: 13px;">
+            Anda akan keluar dari sesi ini. Pastikan semua data sudah tersimpan sebelum melanjutkan.
+            </p>
+        </div>
+
+        <div class="modal-footer border-0 px-4 pb-4 pt-2 d-flex gap-2">
+            <button type="button" class="btn btn-light flex-fill" data-bs-dismiss="modal">
+            Batal
+            </button>
+            <form action="{{ route('logout') }}" method="POST" class="flex-fill">
+            @csrf
+            <button type="submit" class="btn btn-danger w-100">
+                <i class="fa fa-sign-out-alt me-1"></i> Ya, Keluar
+            </button>
+            </form>
+        </div>
+
+        </div>
+    </div>
+    </div>
 </body>
 </html>
