@@ -54,12 +54,10 @@ class RekomendasiController extends Controller
 
             foreach ($suppliers as $supplier) {
                 $nilai = $matriks[$supplier->id][$kode];
-                if ($acuan == 0) {
-                    $normal[$supplier->id][$kode] = 0;
-                } elseif ($krit->atribut === 'benefit') {
-                    $normal[$supplier->id][$kode] = $nilai / $acuan;
+                if ($krit->atribut === 'benefit') {
+                    $normal[$supplier->id][$kode] = $acuan == 0 ? 0 : $nilai / $acuan;
                 } else {
-                    $normal[$supplier->id][$kode] = $acuan / $nilai;
+                    $normal[$supplier->id][$kode] = $nilai == 0 ? 1 : $acuan / $nilai;
                 }
             }
         }
@@ -73,7 +71,7 @@ class RekomendasiController extends Controller
             }
             $hasil[] = [
                 'supplier' => $supplier,
-                'vi' => round($vi, 4),
+                'vi' => round($vi, 2),
                 'normal' => $normal[$supplier->id],
                 'matriks' => $matriks[$supplier->id],
             ];

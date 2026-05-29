@@ -23,12 +23,16 @@ class SupplierController extends Controller
         $kriteria = Kriteria::orderBy('id')->get();
 
         return $kriteria->map(function ($item, $index) {
+            $isBenefit = $item->atribut === 'benefit';
+
             return [
                 'id' => $item->id,
                 'kode' => 'C' . ($index + 1),
                 'name' => "nilai[{$item->id}]",
                 'label' => sprintf('%s – %s', 'C' . ($index + 1), $item->nama_kriteria),
-                'badge' => strtoupper($item->atribut),
+                'attribute' => $item->atribut,
+                'badgeLabel' => $isBenefit ? '↑ Lebih Tinggi Lebih Baik' : '↓ Lebih Rendah Lebih Baik',
+                'badgeClass' => $isBenefit ? 'badge-benefit' : 'badge-cost',
                 'step' => '0.0001',
                 'min' => 0,
                 'max' => null,
