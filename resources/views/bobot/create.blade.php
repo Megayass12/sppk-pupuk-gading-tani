@@ -2,6 +2,26 @@
 @section('title', isset($bobot) ? 'Ubah Kriteria' : 'Tambah Kriteria Penilaian')
 
 @section('content')
+<!-- Simplified Sticky Weight Info -->
+<div class="sticky-top mb-3" style="top: 0; z-index: 100; background: #f8f9fa; border-bottom: 2px solid #0dcaf0; padding: 12px 0;">
+    <div class="container-fluid px-md-5">
+        <div class="row g-3 align-items-center">
+            <div class="col-12 col-sm-4">
+                <small class="text-muted d-block">Bobot Tersimpan</small>
+                <div class="fw-bold text-primary" style="font-size: 1.25rem;">{{ number_format($totalKriteria * 100, 2) }}%</div>
+            </div>
+            <div class="col-12 col-sm-4">
+                <small class="text-muted d-block">Sisa Bobot Tersedia</small>
+                <div class="fw-bold text-success" style="font-size: 1.25rem;">{{ number_format($availableBobot * 100, 2) }}%</div>
+            </div>
+            <div class="col-12 col-sm-4">
+                <small class="text-muted d-block">Total Target</small>
+                <div class="fw-bold text-info" style="font-size: 1.25rem;">100%</div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row justify-content-center">
 <div class="col-lg-6">
 <div class="card">

@@ -23,7 +23,9 @@ class KriteriaController extends Controller
 
     public function create()
     {
-        return view('bobot.create');
+        $totalKriteria = Kriteria::sum('bobot');
+        $availableBobot = 1.0 - $totalKriteria;
+        return view('bobot.create', compact('totalKriteria', 'availableBobot'));
     }
 
     public function store(Request $request)
@@ -56,7 +58,9 @@ class KriteriaController extends Controller
 
     public function edit(Kriteria $bobot)
     {
-        return view('bobot.edit', compact('bobot'));
+        $totalKriteria = Kriteria::sum('bobot');
+        $availableBobot = 1.0 - $totalKriteria + $bobot->bobot; // Add back current bobot to available amount
+        return view('bobot.edit', compact('bobot', 'totalKriteria', 'availableBobot'));
     }
 
     public function update(Request $request, Kriteria $bobot)

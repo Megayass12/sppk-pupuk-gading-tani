@@ -74,6 +74,8 @@
         <div class="card-body small text-muted">
             <p><strong>Total bobot harus = 100%</strong> agar sistem dapat menghitung rekomendasi dengan baik.</p>
             <hr>
+            <p><strong>Toleransi bobot = 0.01%</strong> total nilai 99.99%-100.01% ditoleransi oleh sistem.</p>
+            <hr>
             <p><strong>↑ Lebih Tinggi Lebih Baik</strong></p>
             <p class="small">Misal: Kualitas Produk, Kecepatan Pengiriman. Nilai lebih besar = lebih baik.</p>
             <hr>
