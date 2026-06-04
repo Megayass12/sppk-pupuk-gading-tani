@@ -3,21 +3,23 @@
 
 @section('content')
 <div class="card mb-3">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <span><i class="fa fa-building me-2 text-success"></i>Data Supplier Pupuk Kami</span>
-        <div class="d-flex gap-2">
-            <a href="{{ route('supplier.template') }}" class="btn btn-sm btn-outline-secondary">
-                <i class="fa fa-download me-1"></i>Download Template
-            </a>
-            <a href="{{ route('supplier.export') }}" class="btn btn-sm btn-outline-success">
-                <i class="fa fa-file-excel me-1"></i>Export Data
-            </a>
-            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#importModal">
-                <i class="fa fa-upload me-1"></i>Upload Data
-            </button>
-            <a href="{{ route('supplier.create') }}" class="btn btn-sm btn-hijau">
-                <i class="fa fa-plus me-1"></i>Tambah Supplier Baru
-            </a>
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <h6 class="mb-0"><i class="fa fa-building me-2" style="color: #2d6a4f;"></i>Data Supplier Pupuk Kami</h6>
+            <div class="d-flex gap-2 flex-wrap justify-content-end">
+                <a href="{{ route('supplier.template') }}" class="btn btn-sm btn-outline-secondary" style="border-color: #d1e7d6; color: #2d6a4f;">
+                    <i class="fa fa-download me-1"></i><span class="d-none d-md-inline">Template</span>
+                </a>
+                <a href="{{ route('supplier.export') }}" class="btn btn-sm btn-outline-success" style="border-color: #52b788; color: #2d6a4f;">
+                    <i class="fa fa-file-excel me-1"></i><span class="d-none d-md-inline">Export</span>
+                </a>
+                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#importModal" style="border-color: #2d6a4f; color: #2d6a4f;">
+                    <i class="fa fa-upload me-1"></i><span class="d-none d-md-inline">Import</span>
+                </button>
+                <a href="{{ route('supplier.create') }}" class="btn btn-sm btn-hijau" style="background-color: #2d6a4f; border-color: #2d6a4f; font-weight: 600;">
+                    <i class="fa fa-plus me-1"></i><span class="d-none d-md-inline">Tambah Baru</span>
+                </a>
+            </div>
         </div>
     </div>
     <div class="card-body p-0">
