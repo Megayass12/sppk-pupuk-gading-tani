@@ -47,9 +47,16 @@
                             {{ $field['badgeLabel'] }}
                         </span>
                     </label>
+                    <!-- Scale Guide -->
+                    <div class="small text-muted mb-2">
+                        <strong>Skala Penilaian:</strong>
+                        @foreach($field['scaleGuide'] as $scale)
+                        <div>{{ $scale['label'] }}</div>
+                        @endforeach
+                    </div>
                     <input type="number" name="{{ $field['name'] }}" class="form-control @error('nilai.' . $field['id']) is-invalid @enderror"
-                           value="{{ old('nilai.' . $field['id'], $nilai[$field['id']] ?? '') }}" step="{{ $field['step'] }}" min="{{ $field['min'] }}"
-                           @if($field['max'] !== null) max="{{ $field['max'] }}" @endif required>
+                           value="{{ old('nilai.' . $field['id'], $nilai[$field['id']] ?? '') }}" step="{{ $field['step'] }}" min="{{ $field['min'] }}" max="{{ $field['max'] }}" required>
+                    <small class="text-muted d-block mt-1">Nilai: 1 - 5</small>
                     @error('nilai.' . $field['id'])<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 @empty
@@ -69,3 +76,48 @@
 </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validasi input nilai (kriteria) hanya integer 1-5
+    const nilaiInputs = document.querySelectorAll('input[name^="nilai["]');
+
+    nilaiInputs.forEach(input => {
+        // Validasi pada saat input/change
+        input.addEventListener('change', function() {
+            let value = parseInt(this.value);
+
+            if (isNaN(value) || this.value === '') {
+                this.value = '';
+                return;
+            }
+
+            // Ensure value is between 1 and 5
+            if (value < 1) {
+                this.value = '1';
+            } else if (value > 5) {
+                this.value = '5';
+            } else {
+                this.value = value;
+            }
+        });
+
+        // Validasi on blur
+        input.addEventListener('blur', function() {
+            if (this.value === '') return;
+            let value = parseInt(this.value);
+            if (!isNaN(value)) {
+                if (value < 1) {
+                    this.value = '1';
+                } else if (value > 5) {
+                    this.value = '5';
+                } else {
+                    this.value = value;
+                }
+            }
+        });
+    });
+});
+</script>
+@endpush
