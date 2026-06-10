@@ -25,6 +25,25 @@ class SupplierController extends Controller
         return $kriteria->map(function ($item, $index) {
             $isBenefit = $item->atribut === 'benefit';
 
+            // Scale guide berdasarkan jenis kriteria
+            if ($isBenefit) {
+                $scaleGuide = [
+                    ['value' => 1, 'label' => '1 = Sangat Buruk'],
+                    ['value' => 2, 'label' => '2 = Buruk'],
+                    ['value' => 3, 'label' => '3 = Cukup Baik'],
+                    ['value' => 4, 'label' => '4 = Baik'],
+                    ['value' => 5, 'label' => '5 = Sangat Baik'],
+                ];
+            } else {
+                $scaleGuide = [
+                    ['value' => 1, 'label' => '1 = Sangat Baik (Paling Murah)'],
+                    ['value' => 2, 'label' => '2 = Baik'],
+                    ['value' => 3, 'label' => '3 = Cukup Baik'],
+                    ['value' => 4, 'label' => '4 = Buruk'],
+                    ['value' => 5, 'label' => '5 = Sangat Buruk (Paling Mahal)'],
+                ];
+            }
+
             return [
                 'id' => $item->id,
                 'kode' => 'C' . ($index + 1),
@@ -33,9 +52,10 @@ class SupplierController extends Controller
                 'attribute' => $item->atribut,
                 'badgeLabel' => $isBenefit ? '↑ Lebih Tinggi Lebih Baik' : '↓ Lebih Rendah Lebih Baik',
                 'badgeClass' => $isBenefit ? 'badge-benefit' : 'badge-cost',
-                'step' => '0.0001',
-                'min' => 0,
-                'max' => null,
+                'step' => '1',
+                'min' => 1,
+                'max' => 5,
+                'scaleGuide' => $scaleGuide,
                 'required' => true,
                 'kriteria' => $item,
             ];
@@ -56,7 +76,7 @@ class SupplierController extends Controller
         if ($kriteria->isNotEmpty()) {
             $rules['nilai'] = 'required|array';
             foreach ($kriteria as $item) {
-                $rules['nilai.' . $item->id] = 'required|numeric|min:0';
+                $rules['nilai.' . $item->id] = 'required|integer|min:1|max:5';
             }
         } else {
             $rules['nilai'] = 'nullable|array';
@@ -75,9 +95,11 @@ class SupplierController extends Controller
         $kriteria = Kriteria::orderBy('id')->get();
 
         foreach ($kriteria as $item) {
+            $value = isset($nilai[$item->id]) ? (int) $nilai[$item->id] : 1;
+
             PenilaianSupplier::updateOrCreate(
                 ['supplier_id' => $supplier->id, 'kriteria_id' => $item->id],
-                ['nilai' => isset($nilai[$item->id]) ? (float) $nilai[$item->id] : 0]
+                ['nilai' => $value]
             );
         }
     }

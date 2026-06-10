@@ -54,7 +54,7 @@
                 <label class="form-label fw-semibold">Bobot/Persentase Pentingnya <span class="text-danger">*</span></label>
                 <div class="input-group">
                     <input type="number" name="bobot" class="form-control @error('bobot') is-invalid @enderror"
-                           value="{{ old('bobot', isset($bobot) ? $bobot->bobot * 100 : '') }}" step="0.01" min="0" max="100" placeholder="30" required>
+                           value="{{ old('bobot', isset($bobot) ? number_format($bobot->bobot * 100, 2, '.', '') : '') }}" step="0.01" min="0" max="100" placeholder="30" required>
                     <span class="input-group-text">%</span>
                 </div>
                 <small class="form-text text-muted">Masukkan persentase dari 0 sampai 100. Contoh: 30 berarti kriteria ini 30% pentingnya</small>

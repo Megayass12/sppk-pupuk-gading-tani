@@ -47,7 +47,7 @@
                     <td>{{ $s->email }}</td>
                     @foreach($kriteria as $krit)
                     @php $nilai = optional($s->penilaian->where('kriteria_id', $krit->id)->first())->nilai ?? 0; @endphp
-                    <td class="text-center">{{ $nilai }}</td>
+                    <td class="text-center">{{ (int) $nilai }}</td>
                     @endforeach
                     <td class="text-center">
                         <a href="{{ route('supplier.edit', $s) }}" class="btn btn-xs btn-outline-warning btn-sm" title="Ubah">
