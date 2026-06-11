@@ -17,7 +17,8 @@
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Kode Supplier <span class="text-danger">*</span></label>
                     <input type="text" name="kode" class="form-control @error('kode') is-invalid @enderror"
-                           value="{{ old('kode', $supplier->kode ?? '') }}" placeholder="S001" required {{ isset($supplier) ? 'readonly' : '' }}>
+                           value="{{ old('kode', $supplier->kode ?? $nextKode ?? '') }}" placeholder="S001" required readonly>
+                    <div class="form-text text-muted">Kode akan dibuat otomatis berdasarkan kode supplier tertinggi.</div>
                     @error('kode')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="col-md-8">
