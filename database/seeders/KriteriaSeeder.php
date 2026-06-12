@@ -18,6 +18,11 @@ class KriteriaSeeder extends Seeder
             [
                 'nama_kriteria' => 'Kualitas/sample',
                 'atribut' => 'benefit',
+                'bobot' => 0.2273,
+            ],
+            [
+                'nama_kriteria' => 'Legalitas',
+                'atribut' => 'benefit',
                 'bobot' => 0.2045,
             ],
             [
@@ -26,14 +31,9 @@ class KriteriaSeeder extends Seeder
                 'bobot' => 0.1818,
             ],
             [
-                'nama_kriteria' => 'Sertifikasi',
-                'atribut' => 'benefit',
-                'bobot' => 0.2045,
-            ],
-            [
                 'nama_kriteria' => 'Respon supplier',
                 'atribut' => 'benefit',
-                'bobot' => 0.2273,
+                'bobot' => 0.2045,
             ],
         ];
 
