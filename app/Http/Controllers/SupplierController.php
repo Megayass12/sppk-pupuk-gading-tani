@@ -62,6 +62,18 @@ class SupplierController extends Controller
         })->toArray();
     }
 
+    private function generateSupplierKode(): string
+    {
+        $lastNumber = Supplier::where('kode', 'like', 'S%')
+            ->get()
+            ->map(fn($item) => intval(preg_replace('/[^0-9]/', '', $item->kode)))
+            ->max();
+
+        $nextNumber = ($lastNumber ?? 0) + 1;
+
+        return 'S' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+    }
+
     private function supplierRules(?Supplier $supplier = null): array
     {
         $rules = [
@@ -115,11 +127,14 @@ class SupplierController extends Controller
     public function create()
     {
         $kriteriaFields = $this->buildSupplierKriteriaFields();
-        return view('supplier.create', compact('kriteriaFields'));
+        $nextKode = $this->generateSupplierKode();
+
+        return view('supplier.create', compact('kriteriaFields', 'nextKode'));
     }
 
     public function store(Request $request)
     {
+        $request->merge(['kode' => $this->generateSupplierKode()]);
         $request->validate($this->supplierRules());
 
         $supplier = Supplier::create($this->supplierBaseData($request));
@@ -176,12 +191,12 @@ class SupplierController extends Controller
         $kriteria = Kriteria::orderBy('id')->get();
 
         $headers = array_merge(
-            ['kode', 'nama_supplier', 'alamat', 'no_telp', 'email'],
+            ['nama_supplier', 'alamat', 'no_telp', 'email'],
             $kriteria->map(fn($item) => 'Kriteria: ' . $item->nama_kriteria)->toArray()
         );
 
         $example = array_merge(
-            ['S001', 'PT Contoh Pupuk', 'Surabaya', '08123456789', 'info@contoh.com'],
+            ['PT Contoh Pupuk', 'Surabaya', '08123456789', 'info@contoh.com'],
             $kriteria->map(fn() => 0)->toArray()
         );
 

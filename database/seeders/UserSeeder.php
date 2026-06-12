@@ -16,12 +16,5 @@ class UserSeeder extends Seeder
             'username' => 'admin',
             'password' => Hash::make('password123'),
         ]);
-
-        // Create additional user
-        User::create([
-            'name' => 'Manager',
-            'username' => 'manager',
-            'password' => Hash::make('password123'),
-        ]);
     }
 }

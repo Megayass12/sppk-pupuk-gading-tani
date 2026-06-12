@@ -71,7 +71,7 @@ class RekomendasiController extends Controller
             }
             $hasil[] = [
                 'supplier' => $supplier,
-                'vi' => round($vi, 2),
+                'vi' => round($vi, 4),
                 'normal' => $normal[$supplier->id],
                 'matriks' => $matriks[$supplier->id],
             ];
