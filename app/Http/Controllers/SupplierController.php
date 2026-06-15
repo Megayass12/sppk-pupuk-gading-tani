@@ -36,11 +36,11 @@ class SupplierController extends Controller
                 ];
             } else {
                 $scaleGuide = [
-                    ['value' => 1, 'label' => '1 = Sangat Baik (Paling Murah)'],
-                    ['value' => 2, 'label' => '2 = Baik'],
-                    ['value' => 3, 'label' => '3 = Cukup Baik'],
-                    ['value' => 4, 'label' => '4 = Buruk'],
-                    ['value' => 5, 'label' => '5 = Sangat Buruk (Paling Mahal)'],
+                    ['value' => 1, 'label' => '1 = Sangat Baik (≤ Rp 114.000)'],
+                    ['value' => 2, 'label' => '2 = Baik (Rp 114.001 – Rp 118.000)'],
+                    ['value' => 3, 'label' => '3 = Cukup Baik (Rp 118.001 – Rp 122.000)'],
+                    ['value' => 4, 'label' => '4 = Buruk (Rp 122.001 – Rp 126.000)'],
+                    ['value' => 5, 'label' => '5 = Sangat Buruk (> Rp 126.000)'],
                 ];
             }
 
